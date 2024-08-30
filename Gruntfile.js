@@ -52,5 +52,8 @@ module.exports = function (grunt) {
   grunt.registerTask('psHtmlminTest', runTests);
 
   // By default, lint and run all tests.
+  grunt.registerTask('dev', ['jshint', 'psHtmlmin', 'psHtmlminTest']);
+
+  // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'clean', 'psHtmlmin', 'psHtmlminTest']);
 };

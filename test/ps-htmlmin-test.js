@@ -1,29 +1,40 @@
+/*
+ * grunt-ps-htmlmin
+ * https://github.com/PSelvaraj/grunt-ps-htmlmin
+ *
+ * Copyright (c) 2024 Peter Selvaraj
+ * Licensed under the MIT license.
+ */
+
 'use strict';
 
-const fs = require('fs');
 const glob = require('fast-glob');
 const log = require('grunt-ps-log');
+const assert = require('./services/assert.service');
 
-const runTests = () => {
-  const patts = [
-    'test/expected/**/*.html'
-  ];
+module.exports = function (grunt) {
+  grunt.registerMultiTask('psHtmlminTest', 'Testing grunt-ps-htmlmin plugin', async function () {
+    const done = this.async();
 
-  const files = glob.sync(patts);
+    const patts = [
+      'test/expected/**/*.html'
+    ];
 
-  files.forEach(file => {
-    const outFile = file.replace('test\/expected', 'tmp');
+    const files = glob.sync(patts);
 
-    const inp = fs.readFileSync(file).toString();
-    const out = fs.readFileSync(outFile).toString();
+    const promises = files.map(async (inpPath) => {
+      const expPath = inpPath.replace('test/expected', 'tmp');
 
-    if (inp === out) {
-      log.ok('Test passed!');
-    }
-    else {
-      log.warn('Test failed!');
-    }
+      if (await assert.contentEquality(inpPath, expPath)) {
+        log.ok('Test passed!');
+      }
+      else {
+        log.warn('Test failed!');
+      }
+    });
+
+    await Promise.all(promises);
+
+    done();
   });
 };
-
-module.exports = runTests;
